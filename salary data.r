@@ -1,0 +1,35 @@
+salary_train<- read.csv(file.choose())
+salary_test<- read.csv(file.choose())
+class(salary_train)
+class(salary_test)
+salary_train$Salary<-factor(salary_train$Salary)
+salary_test$Salary<-factor(salary_test$Salary)
+library(tm)
+salary_corpus_train<-Corpus(VectorSource(salary_train$Salary))
+salary_corpus_test<- Corpus(VectorSource(salary_test$Salary))
+
+#train data cleaning
+corpus_clean_train<- tm_map(salary_corpus_train,tolower)
+corpus_clean_train<- tm_map(corpus_clean_train,removeNumbers)
+corpus_clean_train<-tm_map(corpus_clean_train,removeWords,stopwords())
+corpus_clean_train<-tm_map(corpus_clean_train,removePunctuation)
+remove_train<- function(x) gsub("[^[:alpha:][:space:]]*"," ",x)
+corpus_clean_train<- tm_map(corpus_clean_train,content_transformer(remove_train))
+corpus_clean_train<- tm_map(corpus_clean_train,stripWhitespace)
+class(corpus_clean_train)
+
+#test data cleaning
+
+corpus_clean_test<- tm_map(salary_corpus_test,tolower)
+corpus_clean_test<- tm_map(corpus_clean_test,removeNumbers)
+corpus_clean_test<-tm_map(corpus_clean_test,removeWords,stopwords())
+corpus_clean_test<-tm_map(corpus_clean_test,removePunctuation)
+remove_test<- function(x) gsub("[^[:alpha:][:space:]]*"," ",x)
+corpus_clean_test<- tm_map(corpus_clean_test,content_transformer(remove_test))
+corpus_clean_test<- tm_map(corpus_clean_test,stripWhitespace)
+class(corpus_clean_test)
+
+salary_dtm_train<- DocumentTermMatrix(corpus_clean_train)
+class(salary_dtm_train)
+salary_dtm_test<- DocumentTermMatrix(corpus_clean_test)
+class(salary_dtm_test)
